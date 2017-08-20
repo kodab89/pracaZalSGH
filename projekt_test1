@@ -1,0 +1,1 @@
+hour(as.POSIXct(test2, format="%d%b%y:%H:%M:%S"))
