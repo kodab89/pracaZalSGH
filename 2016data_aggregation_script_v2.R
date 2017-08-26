@@ -47,6 +47,21 @@ table1 <- fread(fileList2015[i], sep=",", header=TRUE, select = c(2:3,5, 13,19))
   table1 <- table1[(table1$total_payment< 10000 * mean(table1$total_payment)),]
   vector7 <- vector7 + length(table1$pickup_time)
   
+#collect results for removed obs  
+  results <- data.frame(obs=1:7, delta=0, share=0)
+  
+for (i in 1:7) {
+  results[i,] <- get(paste0('vector', i))
+}
+
+results$delta <- c(0, abs(diff(results$obs)))
+
+results$share <- c(0, 100 * (results$delta / shift(results$obs, 1L, type = 'lag')))[
+!is.na(c(0, results$delta / shift(results$obs, 1L, type = 'lag')))]
+results$share <- round(results$share, 6)
+rm(list = ls(pattern = "vector")) 
+  
+  
 table1$day_id <- lubridate::mday(as.POSIXct(table1$pickup_time, format="%Y-%m-%d %H:%M:%S"))
 table1$fares_no <- 1
 ts_results1 <- aggregate(cbind(fares_no)~day_id, data=table1, sum)
